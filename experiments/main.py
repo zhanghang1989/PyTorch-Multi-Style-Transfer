@@ -58,15 +58,6 @@ def train(args):
 		vgg.cuda()
 
 	style_loader = StyleLoader(args.style_folder, args.style_size)
-	"""
-	style = utils.tensor_load_rgbimage(args.style_image, size=args.style_size)
-	style = style.unsqueeze(0)
-	style = utils.preprocess_batch(style)
-	if args.cuda:
-		style = style.cuda()
-	style_v = Variable(style, volatile=True)
-	utils.subtract_imagenet_mean_batch(style_v)
-	"""
 
 	for e in range(args.epochs):
 		transformer.train()
