@@ -1,3 +1,9 @@
+# PyTorch-Style-Transfer
+
+This repo provides PyTorh Implementation of [MSG-Net (ours)](#msg-net) and [Neural Styls (Gatys et al. CVPR 2016)](#neural-styls). Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
+If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
+
+## MSG-Net
 <table width="100%" border="0" cellspacing="15" cellpadding="0">
 	<tbody>
 		<tr>
@@ -17,11 +23,6 @@
 		</tr>
 	</tbody>
 </table>
-
-# PyTorch-Style-Transfer
-
-Please install [PyTorch](http://pytorch.org/) with cuda and cudnn support. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
-If you would like to produce exactly the same result as in the paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
 
 ### Test Pre-trained Model
 0. Download the pre-trained model
@@ -57,13 +58,27 @@ If you would like to produce exactly the same result as in the paper, please vis
 	```
 0. Train the model
 	```bash
-	python main.py train --epochs 2
+	python main.py train --epochs 4
 	```
 * `--style-folder`: path to the folder style images.
 * `--vgg-model-dir`: path to folder where the vgg model will be downloaded.
 * `--save-model-dir`: path to folder where trained model will be saved.
 * `--cuda`: set it to 1 for running on GPU, 0 for CPU.
 
+## Neural Styls
+[Image Style Transfer Using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf) by Leon A. Gatys, Alexander S. Ecker, and Matthias Bethge.
+
+```bash
+python main.py optim --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg
+```
+* `--content-image`: path to content image.
+* `--style-image`: path to style image.
+* `--output-image`: path for saving the output image.
+* `--content-size`: the content image size to test on.
+* `--style-size`: the style image size to test on.
+* `--cuda`: set it to 1 for running on GPU, 0 for CPU.
+
+<img src ="images/g1.jpg" width="260px" />
 
 ### Acknowledgement
 The code benefits from outstanding prior work and their implementations including:
