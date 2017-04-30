@@ -1,6 +1,6 @@
 # PyTorch-Style-Transfer
 
-This repo provides PyTorh Implementation of [MSG-Net (ours)](#msg-net) and [Neural Styls (Gatys et al. CVPR 2016)](neural-styls). Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
+This repo provides PyTorh Implementation of [MSG-Net (ours)](#msg-net) and [Neural Styls (Gatys et al. CVPR 2016)](#neural-styls). Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
 If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
 
 ## MSG-Net
