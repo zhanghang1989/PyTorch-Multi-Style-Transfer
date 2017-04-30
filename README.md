@@ -1,6 +1,6 @@
 # PyTorch-Style-Transfer
 
-This repo provides PyTorh Implementation of [MSG-Net (ours)](#msg-net) and [Neural Styls (Gatys et al. CVPR 2016)](#neural-styls). Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
+This repo provides PyTorh Implementation of [MSG-Net (ours)](#msg-net) and [Neural Styls (Gatys et al. CVPR 2016)](#neural-styles). Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
 If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
 
 ## MSG-Net
@@ -65,7 +65,7 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 * `--save-model-dir`: path to folder where trained model will be saved.
 * `--cuda`: set it to 1 for running on GPU, 0 for CPU.
 
-## Neural Styls
+## Neural Styles
 [Image Style Transfer Using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf) by Leon A. Gatys, Alexander S. Ecker, and Matthias Bethge.
 
 ```bash
