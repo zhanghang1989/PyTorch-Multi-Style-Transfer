@@ -58,6 +58,14 @@ def subtract_imagenet_mean_batch(batch):
 	mean[:, 2, :, :] = 123.680
 	batch = batch - Variable(mean)
 
+def add_imagenet_mean_batch(batch):
+	"""Add ImageNet mean pixel-wise from a BGR image."""
+	tensortype = type(batch.data)
+	mean = tensortype(batch.data.size())
+	mean[:, 0, :, :] = 103.939
+	mean[:, 1, :, :] = 116.779
+	mean[:, 2, :, :] = 123.680
+	batch = batch + Variable(mean)
 
 def preprocess_batch(batch):
 	batch = batch.transpose(0, 1)
