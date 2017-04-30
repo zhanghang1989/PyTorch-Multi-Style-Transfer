@@ -182,6 +182,72 @@ def evaluate(args):
 	utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
+def optimize(args):
+	"""	Gatys et al. CVPR 2017
+	ref: Image Style Transfer Using Convolutional Neural Networks
+	"""
+	# load the content and style target
+	content_image = utils.tensor_load_rgbimage(args.content_image, size=args.content_size, keep_asp=True)
+	content_image = content_image.unsqueeze(0)
+	content_image = Variable(utils.preprocess_batch(content_image), requires_grad=False)
+	utils.subtract_imagenet_mean_batch(content_image)
+	style_image = utils.tensor_load_rgbimage(args.style_image, size=args.style_size)
+	style_image = style_image.unsqueeze(0)	
+	style_image = Variable(utils.preprocess_batch(style_image), requires_grad=False)
+	utils.subtract_imagenet_mean_batch(style_image)
+
+	# load the pre-trained vgg-16 and extract features
+	vgg = Vgg16()
+	utils.init_vgg16(args.vgg_model_dir)
+	vgg.load_state_dict(torch.load(os.path.join(args.vgg_model_dir, "vgg16.weight")))
+	if args.cuda:
+		content_image = content_image.cuda()
+		style_image = style_image.cuda()
+		vgg.cuda()
+	features_content = vgg(content_image)
+	f_xc_c = Variable(features_content[1].data, requires_grad=False)
+	features_style = vgg(style_image)
+	gram_style = [utils.gram_matrix(y) for y in features_style]
+	# init optimizer
+	output = Variable(content_image.data, requires_grad=True)
+	optimizer = Adam([output], lr=args.lr)
+	mse_loss = torch.nn.MSELoss()
+
+	for e in range(args.iters):
+		utils.add_imagenet_mean_batch(output)
+		output.data.clamp_(0, 255)	
+		utils.subtract_imagenet_mean_batch(output)
+
+		optimizer.zero_grad()
+		features_y = vgg(output)
+		content_loss = args.content_weight * mse_loss(features_y[1], f_xc_c)
+
+		style_loss = 0.
+		for m in range(len(features_y)):
+			gram_y = utils.gram_matrix(features_y[m])
+			gram_s = Variable(gram_style[m].data, requires_grad=False)
+			style_loss += args.style_weight * mse_loss(gram_y, gram_s)
+
+		total_loss = content_loss + style_loss
+
+		if (e + 1) % args.log_interval == 0:
+			print(total_loss.data.cpu().numpy()[0])
+			"""
+			mesg = "[{}/{}]\tcontent: {:.6f}\tstyle: {:.6f}\ttotal: {:.6f}".format(
+				e + 1, args.iters,
+				content_loss,
+				style_loss,
+				(content_loss + style_loss)
+			)
+			print(mesg)
+			"""
+		total_loss.backward()
+		
+		optimizer.step()
+			
+	utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
+
+
 def main():
 	args = Options().parse()
 	if args.subcommand is None:
@@ -195,7 +261,9 @@ def main():
 	if args.subcommand == "train":
 		check_paths(args)
 		train(args)
-	else:
+	elif args.subcommand == 'eval':
 		evaluate(args)
+	else:
+		optimize(args)
 
 main()
