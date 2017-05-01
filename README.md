@@ -5,11 +5,11 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 
 **Tabe of content**
 
-* [MSG-Net Experiments](msg-net)
-	- [Stylize Images in Real-time MSG-Net](stylize-images-using-pre-trained-msg-net)
-	- [Train Your Own MSG-Net Model](train-your-own-msg-net-model)
-* [Slow Neural Styles](neural-styles)
-* [Extending the Software](extending-the-software)
+* [MSG-Net Experiments](#msg-net)
+	- [Stylize Images in Real-time MSG-Net](#stylize-images-using-pre-trained-msg-net)
+	- [Train Your Own MSG-Net Model](#train-your-own-msg-net-model)
+* [Slow Neural Styles](#neural-styles)
+* [Extending the Software](#extending-the-software)
 
 ## MSG-Net
 <table width="100%" border="0" cellspacing="15" cellpadding="0">
