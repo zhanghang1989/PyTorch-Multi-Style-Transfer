@@ -31,7 +31,8 @@ class StyleLoader():
 		style = utils.preprocess_batch(style)
 		if self.cuda:
 			style = style.cuda()
-		style_v = Variable(style, volatile=True)
+		style_v = Variable(style, requires_grad=False)
+		#style_v = Variable(style, volatile=True)
 		return style_v
 
 	def size(self):

@@ -8,10 +8,24 @@
 ## LICENSE file in the root directory of this source tree 
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
 from torch.autograd import Variable
+
+class MultConst(nn.Module):
+	def forward(self, input):
+		return 255*input
+
+
+class GramMatrix(nn.Module):
+	def forward(self, y):
+		(b, ch, h, w) = y.size()
+		features = y.view(b, ch, w * h)
+		features_t = features.transpose(1, 2)
+		gram = features.bmm(features_t) / (ch * h * w)
+		return gram
+	
 
 class InstanceNormalization(nn.Module):
 	"""InstanceNormalization
@@ -43,77 +57,6 @@ class InstanceNormalization(nn.Module):
 		out = (x - mean) / torch.sqrt(var + self.eps)
 		out = out * scale_broadcast + shift_broadcast
 		return out
-
-class MultConst(nn.Module):
-	def forward(self, input):
-		return 255*input
-
-class HangSNet(nn.Module):
-	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=InstanceNormalization, n_blocks=6, gpu_ids=[]):
-		super(HangSNet, self).__init__()
-		self.gpu_ids = gpu_ids
-
-		# make bottleneck as an option
-		block = Bottleneck
-		upblock = UpBottleneck
-		expansion = 4
-
-		model = []
-		model += [ConvLayer(input_nc, 64, kernel_size=7, stride=1),
-							norm_layer(64),
-							nn.ReLU(inplace=True),
-							block(64, 32, 2, 1, norm_layer),
-							block(32*expansion, ngf, 2, 1, norm_layer)]
-
-		self.ins = Inspiration(ngf*expansion)
-		model += [self.ins]
-		for i in range(n_blocks):
-			model += [block(ngf*expansion, ngf, 1, None, norm_layer)]
-
-		model += [upblock(ngf*expansion, 32, 2, norm_layer),
-							upblock(32*expansion, 16, 2, norm_layer),
-							norm_layer(64),
-							nn.ReLU(inplace=True),
-							ConvLayer(64, output_nc, kernel_size=7, stride=1)]
-		model += [nn.Tanh(),
-							MultConst()]
-		self.model = nn.Sequential(*model)
-
-	def setTarget(self, G):
-		self.ins.setTarget(G)
-
-	def forward(self, input):
-		return self.model(input)
-
-
-class Inspiration(nn.Module):
-	""" Inspiration Layer (from MSG-Net paper)
-	tuning the featuremap with target Gram Matrix
-	ref https://arxiv.org/abs/1703.06953
-	"""
-	def __init__(self, C, B=1):
-		super(Inspiration, self).__init__()
-		# B is equal to 1 or input mini_batch
-		self.weight = nn.Parameter(torch.Tensor(1,C,C), requires_grad=True)
-		# non-parameter buffer
-		self.register_buffer('G', torch.Tensor(B,C,C))
-		self.C = C
-		self.reset_parameters()
-
-	def reset_parameters(self):
-		self.weight.data.uniform_(0.0, 0.02)
-
-	def setTarget(self, target):
-		self.G = target.view_as(self.G).data
-
-	def forward(self, X):
-		# input X is a 3D feature map
-		self.P = torch.bmm(self.weight.expand_as(self.G), Variable(self.G))
-		return torch.bmm(self.P.transpose(1,2).expand(X.size(0), self.C, self.C), X.view(X.size(0),X.size(1),-1)).view_as(X)
-
-	def __repr__(self):
-		return self.__class__.__name__ + '(' \
-			+ 'N x ' + str(self.C) + ')'
 
 
 class Basicblock(nn.Module):

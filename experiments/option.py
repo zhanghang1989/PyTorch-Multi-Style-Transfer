@@ -9,6 +9,8 @@ class Options():
 		# training args
 		train_arg = subparsers.add_parser("train",
 									help="parser for training arguments")
+		train_arg.add_argument("--net-type", type=str, default="v1",
+								help="type of the network, default is v1")
 		train_arg.add_argument("--epochs", type=int, default=2,
 								help="number of training epochs, default is 2")
 		train_arg.add_argument("--batch-size", type=int, default=4,
@@ -69,6 +71,8 @@ class Options():
 
 		# evaluation args
 		eval_arg = subparsers.add_parser("eval", help="parser for evaluation/stylizing arguments")
+		eval_arg.add_argument("--net-type", type=str, default="v1",
+								help="type of the network, default is v1")
 		eval_arg.add_argument("--content-image", type=str, required=True,
 								help="path to content image you want to stylize")
 		eval_arg.add_argument("--style-image", type=str, default="images/9styles/candy.jpg",
