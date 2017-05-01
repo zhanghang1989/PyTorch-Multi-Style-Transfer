@@ -3,6 +3,14 @@
 This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Styles (Gatys et al. CVPR 2016)](#neural-styles)**. Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
 If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
 
+**Tabe of content**
+
+* [MSG-Net Experiments](msg-net)
+	- [Stylize Images in Real-time MSG-Net](stylize-images-using-pre-trained-msg-net)
+	- [Train Your Own MSG-Net Model](train-your-own-msg-net-model)
+* [Slow Neural Styles](neural-styles)
+* [Extending the Software](extending-the-software)
+
 ## MSG-Net
 <table width="100%" border="0" cellspacing="15" cellpadding="0">
 	<tbody>
@@ -79,6 +87,18 @@ python main.py optim --content-image images/content/venice-boat.jpg --style-imag
 * `--cuda`: set it to 1 for running on GPU, 0 for CPU.
 
 <img src ="images/g1.jpg" width="260px" />
+
+## Extending the Software
+
+* Extending a new network type:
+	- define your own file under the folder `net/` 
+	- implement your own `nn.Module` in `mynn.py` if need
+	- implement train and evaluate functions base on your need
+	- set up the import in the follows
+* Extending a new experiment (changing the options)
+	- define the subcommand of the options
+	- implement the experiment function like `optimize()`
+	- set up the experiment as follows
 
 ### Acknowledgement
 The code benefits from outstanding prior work and their implementations including:
