@@ -1,6 +1,6 @@
 # PyTorch-Style-Transfer
 
-This repo provides PyTorh Implementation of [MSG-Net (ours)](#msg-net) and [Neural Styles (Gatys et al. CVPR 2016)](#neural-styles). Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
+This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Styles (Gatys et al. CVPR 2016)](#neural-styles)**. Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
 If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
 
 ## MSG-Net
@@ -24,7 +24,7 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	</tbody>
 </table>
 
-### Test Pre-trained Model
+### Stylize Images Using Pre-trained MSG-Net
 0. Download the pre-trained model
 	```bash
 	git clone git@github.com:zhanghang1989/PyTorch-Style-Transfer.git
@@ -51,8 +51,8 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 <img src ="images/8.jpg" width="260px" />
 <img src ="images/9.jpg" width="260px" />
 
-### Train Your Own Model
-0. Download the dataset
+### Train Your Own MSG-Net Model
+0. Download the COCO dataset
 	```bash
 	bash dataset/download_dataset.sh
 	```
