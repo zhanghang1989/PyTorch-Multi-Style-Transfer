@@ -94,11 +94,11 @@ python main.py optim --content-image images/content/venice-boat.jpg --style-imag
 	- define your own file under the folder `net/` 
 	- implement your own `nn.Module` in `mynn.py` if need
 	- implement train and evaluate functions base on your need
-	- set up the import in the follows
+	- set up the network as in `main.py`
 * Extending a new experiment (changing the options)
 	- define the subcommand of the options
 	- implement the experiment function like `optimize()`
-	- set up the experiment as follows
+	- set up the experiment as in `main.py`
 
 ### Acknowledgement
 The code benefits from outstanding prior work and their implementations including:
