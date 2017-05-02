@@ -1,14 +1,14 @@
 # PyTorch-Style-Transfer
 
-This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Styles (Gatys et al. CVPR 2016)](#neural-styles)**. Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
+This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Style (Gatys et al. CVPR 2016)](#neural-style)**. Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
 If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
 
 **Tabe of content**
 
-* [MSG-Net Experiments](#msg-net)
-	- [Stylize Images in Real-time MSG-Net](#stylize-images-using-pre-trained-msg-net)
+* [Real-time Style Transfer using MSG-Net](#msg-net)
+	- [Stylize Images using Pre-trained Model](#stylize-images-using-pre-trained-msg-net)
 	- [Train Your Own MSG-Net Model](#train-your-own-msg-net-model)
-* [Slow Neural Styles](#neural-styles)
+* [Slow Neural Style Transfer](#neural-style)
 * [Extending the Software](#extending-the-software)
 
 ## MSG-Net
@@ -43,12 +43,16 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	```bash
 	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg --model models/9styles.model
 	```
-* `--content-image`: path to content image you want to stylize.
-* `--style-image`: path to style image (typically covered during the training).
-* `--model`: path to the pre-trained model to be used for stylizing the image.
-* `--output-image`: path for saving the output image.
-* `--content-size`: the content image size to test on.
-* `--cuda`: set it to 1 for running on GPU, 0 for CPU.
+* If you don't have a GPU, simply set `--cuda=0`. For a different style, set `--style-image path/to/style`.
+	If you would to stylize your own photo, change the `--content-image path/to/your/photo`. 
+	More options:
+
+	* `--content-image`: path to content image you want to stylize.
+	* `--style-image`: path to style image (typically covered during the training).
+	* `--model`: path to the pre-trained model to be used for stylizing the image.
+	* `--output-image`: path for saving the output image.
+	* `--content-size`: the content image size to test on.
+	* `--cuda`: set it to 1 for running on GPU, 0 for CPU.
 
 <img src ="images/1.jpg" width="260px" /> <img src ="images/2.jpg" width="260px" />
 <img src ="images/3.jpg" width="260px" />
@@ -68,12 +72,14 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	```bash
 	python main.py train --epochs 4
 	```
-* `--style-folder`: path to the folder style images.
-* `--vgg-model-dir`: path to folder where the vgg model will be downloaded.
-* `--save-model-dir`: path to folder where trained model will be saved.
-* `--cuda`: set it to 1 for running on GPU, 0 for CPU.
+* If you would like to customize styles, set `--style-folder path/to/your/styles`. More options:
+	* `--style-folder`: path to the folder style images.
+	* `--vgg-model-dir`: path to folder where the vgg model will be downloaded.
+	* `--save-model-dir`: path to folder where trained model will be saved.
+	* `--cuda`: set it to 1 for running on GPU, 0 for CPU.
 
-## Neural Styles
+## Neural Style
+
 [Image Style Transfer Using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf) by Leon A. Gatys, Alexander S. Ecker, and Matthias Bethge.
 
 ```bash
@@ -95,8 +101,8 @@ python main.py optim --content-image images/content/venice-boat.jpg --style-imag
 	- implement your own `nn.Module` in `mynn.py` if need
 	- implement train and evaluate functions base on your need
 	- set up the network as in `main.py`
-* Extending a new experiment (changing the options)
-	- define the subcommand of the options
+* Extending a new experiment (requires differet setting)
+	- define the subcommand of the options in `option.py`
 	- implement the experiment function like `optimize()`
 	- set up the experiment as in `main.py`
 
