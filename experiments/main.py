@@ -9,20 +9,13 @@
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
-import sys
-import time
-import numpy as np
 
 import torch
 from torch.autograd import Variable
 from torch.optim import Adam
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision import transforms
 
 import utils
 from option import Options
-from StyleLoader import StyleLoader
 from vgg16 import Vgg16
 
 def main():
@@ -45,20 +38,18 @@ def main():
 	if args.cuda and not torch.cuda.is_available():
 		raise ValueError("ERROR: cuda is not available, try running on CPU")
 
+	# set the net-type
+	if args.net_type == "v1":
+		from net import msg_net_v1 as exp
+	else:
+		raise ValueError('Unknow net-type')
+
 	if args.subcommand == "train":
-		# Training the model of user defined net-type
-		if args.net_type == "v1":
-			from net import msg_net_v1 as exp	
-		else:
-			raise ValueError('Unknow net-type')
+		# Training the model 
 		exp.train(args)
 
 	elif args.subcommand == 'eval':
 		# Test the pre-trained model
-		if args.net_type == "v1":
-			from net import msg_net_v1 as exp	
-		else:
-			raise ValueError('Unknow net-type')
 		exp.evaluate(args)
 
 	elif args.subcommand == 'optim':

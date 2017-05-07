@@ -9,9 +9,6 @@
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision import transforms
 from torch.autograd import Variable
 
 import utils
@@ -32,7 +29,6 @@ class StyleLoader():
 		if self.cuda:
 			style = style.cuda()
 		style_v = Variable(style, requires_grad=False)
-		#style_v = Variable(style, volatile=True)
 		return style_v
 
 	def size(self):
