@@ -44,6 +44,8 @@ class Options():
 		# optim args (Gatys CVPR 2016)
 		optim_arg = subparsers.add_parser("optim",
 									help="parser for optimization arguments")
+		eval_arg.add_argument("--net-type", type=str, default="v1",
+								help="type of the network, default is v1")
 		optim_arg.add_argument("--iters", type=int, default=500,
 								help="number of training iterations, default is 500")
 		optim_arg.add_argument("--content-image", type=str, default="images/content/venice-boat.jpg",
