@@ -21,10 +21,11 @@ from torchvision import datasets
 from torchvision import transforms
 import torch.nn as nn
 
-import utils
-import mynn as nn2
-from StyleLoader import StyleLoader
-from vgg16 import Vgg16
+import net.mynn as nn2
+from myutils import utils
+from myutils.vgg16 import Vgg16 
+from myutils.StyleLoader import StyleLoader
+
 
 def train(args):
 	check_paths(args)
@@ -44,7 +45,7 @@ def train(args):
 	train_dataset = datasets.ImageFolder(args.dataset, transform)
 	train_loader = DataLoader(train_dataset, batch_size=args.batch_size, **kwargs)
 
-	transformer = HangSNetV1()
+	transformer = Net()
 	print(transformer)
 	optimizer = Adam(transformer.parameters(), args.lr)
 	mse_loss = torch.nn.MSELoss()
@@ -73,17 +74,16 @@ def train(args):
 				x = x.cuda()
 
 			style_v = style_loader.get(batch_id)
-			utils.subtract_imagenet_mean_batch(style_v)
+			style_v = utils.subtract_imagenet_mean_batch(style_v)
 			features_style = vgg(style_v)
 			gram_style = [utils.gram_matrix(y) for y in features_style]
-
-			transformer.setTarget(Variable(gram_style[2].data, requires_grad=False))
+			transformer.setTarget(gram_style[2].data)
 
 			y = transformer(x)
 			xc = Variable(x.data.clone(), volatile=True)
 
-			utils.subtract_imagenet_mean_batch(y)
-			utils.subtract_imagenet_mean_batch(xc)
+			y = utils.subtract_imagenet_mean_batch(y)
+			xc = utils.subtract_imagenet_mean_batch(xc)
 
 			features_y = vgg(y)
 			features_xc = vgg(xc)
@@ -160,7 +160,7 @@ def evaluate(args):
 	utils.init_vgg16(args.vgg_model_dir)
 	vgg.load_state_dict(torch.load(os.path.join(args.vgg_model_dir, "vgg16.weight")))
 
-	style_model = HangSNetV1()
+	style_model = Net()
 	style_model.load_state_dict(torch.load(args.model))
 
 	if args.cuda:
@@ -170,22 +170,20 @@ def evaluate(args):
 		style = style.cuda()
 
 	style_v = Variable(style, volatile=True)
-	utils.subtract_imagenet_mean_batch(style_v)
+	style_v = utils.subtract_imagenet_mean_batch(style_v)
 	features_style = vgg(style_v)
 	gram_style = [utils.gram_matrix(y) for y in features_style]
 
 	content_image = Variable(utils.preprocess_batch(content_image))
-	target = Variable(gram_style[2].data, requires_grad=False)
-	style_model.setTarget(target)
+	style_model.setTarget(gram_style[2].data)
 
 	output = style_model(content_image)
 	utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
-
-class HangSNetV1(nn.Module):
-	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn2.InstanceNormalization, n_blocks=6, gpu_ids=[]):
-		super(HangSNetV1, self).__init__()
+class Net(nn.Module):
+	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn2.InstanceNormalization, n_blocks=9, gpu_ids=[]):
+		super(Net, self).__init__()
 		self.gpu_ids = gpu_ids
 
 		# make bottleneck as an option
@@ -239,7 +237,7 @@ class Inspiration(nn.Module):
 		self.weight.data.uniform_(0.0, 0.02)
 
 	def setTarget(self, target):
-		self.G = target.view_as(self.G).data
+		self.G = target.expand_as(self.G)
 
 	def forward(self, X):
 		# input X is a 3D feature map

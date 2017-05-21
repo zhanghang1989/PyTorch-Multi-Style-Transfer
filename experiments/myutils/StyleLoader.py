@@ -11,7 +11,7 @@
 import os
 from torch.autograd import Variable
 
-import utils
+from myutils import utils
 
 class StyleLoader():
 	def __init__(self, style_folder, style_size, cuda=True):

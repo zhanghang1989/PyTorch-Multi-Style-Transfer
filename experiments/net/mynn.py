@@ -13,6 +13,13 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+def var(x, dim=0):
+    '''
+    Calculates variance.
+    '''
+    x_zero_meaned = x - x.mean(dim).expand_as(x)
+    return x_zero_meaned.pow(2).mean(dim)
+
 class MultConst(nn.Module):
 	def forward(self, input):
 		return 255*input
@@ -200,4 +207,3 @@ class UpsampleConvLayer(torch.nn.Module):
 			x = self.reflection_pad(x)
 		out = self.conv2d(x)
 		return out
-

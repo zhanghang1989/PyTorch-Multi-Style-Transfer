@@ -14,9 +14,9 @@ import torch
 from torch.autograd import Variable
 from torch.optim import Adam
 
-import utils
+from myutils import utils
+from myutils.vgg16 import Vgg16 
 from option import Options
-from vgg16 import Vgg16
 
 def main():
 	"""
@@ -40,7 +40,7 @@ def main():
 
 	# set the net-type
 	if args.net_type == "v1":
-		from net import msg_net_v1 as exp
+		from net import msg_net_v1 as exp	
 	else:
 		raise ValueError('Unknow net-type')
 
@@ -68,11 +68,11 @@ def optimize(args):
 	content_image = utils.tensor_load_rgbimage(args.content_image, size=args.content_size, keep_asp=True)
 	content_image = content_image.unsqueeze(0)
 	content_image = Variable(utils.preprocess_batch(content_image), requires_grad=False)
-	utils.subtract_imagenet_mean_batch(content_image)
+	content_image = utils.subtract_imagenet_mean_batch(content_image)
 	style_image = utils.tensor_load_rgbimage(args.style_image, size=args.style_size)
 	style_image = style_image.unsqueeze(0)	
 	style_image = Variable(utils.preprocess_batch(style_image), requires_grad=False)
-	utils.subtract_imagenet_mean_batch(style_image)
+	style_image = utils.subtract_imagenet_mean_batch(style_image)
 
 	# load the pre-trained vgg-16 and extract features
 	vgg = Vgg16()
@@ -92,10 +92,7 @@ def optimize(args):
 	mse_loss = torch.nn.MSELoss()
 	# optimizing the images
 	for e in range(args.iters):
-		utils.add_imagenet_mean_batch(output)
-		output.data.clamp_(0, 255)	
-		utils.subtract_imagenet_mean_batch(output)
-
+		utils.imagenet_clamp_batch(output, 0, 255)
 		optimizer.zero_grad()
 		features_y = vgg(output)
 		content_loss = args.content_weight * mse_loss(features_y[1], f_xc_c)
@@ -114,6 +111,7 @@ def optimize(args):
 		
 		optimizer.step()
 	# save the image	
+	output = utils.add_imagenet_mean_batch(output)
 	utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
