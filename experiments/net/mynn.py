@@ -20,6 +20,7 @@ def var(x, dim=0):
     x_zero_meaned = x - x.mean(dim).expand_as(x)
     return x_zero_meaned.pow(2).mean(dim)
 
+
 class MultConst(nn.Module):
 	def forward(self, input):
 		return 255*input

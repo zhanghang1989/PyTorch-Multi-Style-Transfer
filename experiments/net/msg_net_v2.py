@@ -205,8 +205,7 @@ class Net(nn.Module):
 							norm_layer(16*expansion),
 							nn.ReLU(inplace=True),
 							nn2.ConvLayer(16*expansion, output_nc, kernel_size=7, stride=1)]
-		model += [nn.Tanh(),
-							nn2.MultConst()]
+
 		self.model = nn.Sequential(*model)
 
 	def setTarget(self, Xs):
