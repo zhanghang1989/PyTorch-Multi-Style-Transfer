@@ -9,8 +9,8 @@ class Options():
 		# training args
 		train_arg = subparsers.add_parser("train",
 									help="parser for training arguments")
-		train_arg.add_argument("--net-type", type=str, default="v1",
-								help="type of the network, default is v1")
+		train_arg.add_argument("--net-type", type=str, default="v2",
+								help="type of the network, default is v2")
 		train_arg.add_argument("--epochs", type=int, default=2,
 								help="number of training epochs, default is 2")
 		train_arg.add_argument("--batch-size", type=int, default=4,
@@ -40,6 +40,8 @@ class Options():
 								help="learning rate, default is 0.001")
 		train_arg.add_argument("--log-interval", type=int, default=500,
 								help="number of images after which the training loss is logged, default is 500")
+		train_arg.add_argument("--resume", type=str, default=None,
+								help="resume if needed")
 
 		# optim args (Gatys CVPR 2016)
 		optim_arg = subparsers.add_parser("optim",

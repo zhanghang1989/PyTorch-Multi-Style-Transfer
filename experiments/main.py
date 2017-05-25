@@ -41,6 +41,8 @@ def main():
 	# set the net-type
 	if args.net_type == "v1":
 		from net import msg_net_v1 as exp	
+	elif args.net_type == "v2":
+		from net import msg_net_v2 as exp	
 	else:
 		raise ValueError('Unknow net-type')
 

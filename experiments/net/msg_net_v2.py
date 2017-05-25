@@ -45,13 +45,9 @@ def train(args):
 	train_dataset = datasets.ImageFolder(args.dataset, transform)
 	train_loader = DataLoader(train_dataset, batch_size=args.batch_size, **kwargs)
 
-	style_model = Net()
-	if args.resume is not None:
-		print('Resuming, initializing using weight from {}.'.format(args.resume))
-		style_model.load_state_dict(torch.load(args.resume))
-
-	print(style_model)
-	optimizer = Adam(style_model.parameters(), args.lr)
+	transformer = Net(ngf=128)
+	print(transformer)
+	optimizer = Adam(transformer.parameters(), args.lr)
 	mse_loss = torch.nn.MSELoss()
 
 	vgg = Vgg16()
@@ -59,13 +55,13 @@ def train(args):
 	vgg.load_state_dict(torch.load(os.path.join(args.vgg_model_dir, "vgg16.weight")))
 
 	if args.cuda:
-		style_model.cuda()
+		transformer.cuda()
 		vgg.cuda()
 
 	style_loader = StyleLoader(args.style_folder, args.style_size)
 
 	for e in range(args.epochs):
-		style_model.train()
+		transformer.train()
 		agg_content_loss = 0.
 		agg_style_loss = 0.
 		count = 0
@@ -78,12 +74,13 @@ def train(args):
 				x = x.cuda()
 
 			style_v = style_loader.get(batch_id)
+			transformer.setTarget(style_v)
+
 			style_v = utils.subtract_imagenet_mean_batch(style_v)
 			features_style = vgg(style_v)
 			gram_style = [utils.gram_matrix(y) for y in features_style]
-			style_model.setTarget(gram_style[2].data)
 
-			y = style_model(x)
+			y = transformer(x)
 			xc = Variable(x.data.clone(), volatile=True)
 
 			y = utils.subtract_imagenet_mean_batch(y)
@@ -112,32 +109,32 @@ def train(args):
 			if (batch_id + 1) % args.log_interval == 0:
 				mesg = "{}\tEpoch {}:\t[{}/{}]\tcontent: {:.6f}\tstyle: {:.6f}\ttotal: {:.6f}".format(
 					time.ctime(), e + 1, count, len(train_dataset),
-								  agg_content_loss / (batch_id + 1),
-								  agg_style_loss / (batch_id + 1),
-								  (agg_content_loss + agg_style_loss) / (batch_id + 1)
+								agg_content_loss / (batch_id + 1),
+								agg_style_loss / (batch_id + 1),
+								(agg_content_loss + agg_style_loss) / (batch_id + 1)
 				)
 				print(mesg)
 
 			
 			if (batch_id + 1) % (4 * args.log_interval) == 0:
 				# save model
-				style_model.eval()
-				style_model.cpu()
-				save_model_filename = "Epoch_" + str(e) +  "iters_" + str(count) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
+				transformer.eval()
+				transformer.cpu()
+				save_model_filename = "Epoch_" + str(e) + "iters_" + str(count) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
 					args.content_weight) + "_" + str(args.style_weight) + ".model"
 				save_model_path = os.path.join(args.save_model_dir, save_model_filename)
-				torch.save(style_model.state_dict(), save_model_path)
-				style_model.train()
-				style_model.cuda()
+				torch.save(transformer.state_dict(), save_model_path)
+				transformer.train()
+				transformer.cuda()
 				print("\nCheckpoint, trained model saved at", save_model_path)
 
 	# save model
-	style_model.eval()
-	style_model.cpu()
+	transformer.eval()
+	transformer.cpu()
 	save_model_filename = "Final_epoch_" + str(args.epochs) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
 		args.content_weight) + "_" + str(args.style_weight) + ".model"
 	save_model_path = os.path.join(args.save_model_dir, save_model_filename)
-	torch.save(style_model.state_dict(), save_model_path)
+	torch.save(transformer.state_dict(), save_model_path)
 
 	print("\nDone, trained model saved at", save_model_path)
 
@@ -154,74 +151,71 @@ def check_paths(args):
 
 
 def evaluate(args):
-	content_image = utils.tensor_load_rgbimage(args.content_image, size=args.content_size, keep_asp=True)
+	content_image = utils.tensor_load_rgbimage(args.content_image)#, size=args.content_size, keep_asp=True)
 	content_image = content_image.unsqueeze(0)
 	style = utils.tensor_load_rgbimage(args.style_image, size=args.style_size)
 	style = style.unsqueeze(0)	
 	style = utils.preprocess_batch(style)
 
-	vgg = Vgg16()
-	utils.init_vgg16(args.vgg_model_dir)
-	vgg.load_state_dict(torch.load(os.path.join(args.vgg_model_dir, "vgg16.weight")))
-
-	style_model = Net()
+	style_model = Net(ngf=128)
 	style_model.load_state_dict(torch.load(args.model))
 
 	if args.cuda:
 		style_model.cuda()
-		vgg.cuda()
 		content_image = content_image.cuda()
 		style = style.cuda()
 
 	style_v = Variable(style, volatile=True)
-	style_v = utils.subtract_imagenet_mean_batch(style_v)
-	features_style = vgg(style_v)
-	gram_style = [utils.gram_matrix(y) for y in features_style]
 
 	content_image = Variable(utils.preprocess_batch(content_image))
-	style_model.setTarget(gram_style[2].data)
+	style_model.setTarget(style_v)
 
 	output = style_model(content_image)
 	utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
 class Net(nn.Module):
-	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn2.InstanceNormalization, n_blocks=9, gpu_ids=[]):
+	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn2.InstanceNormalization, n_blocks=6, gpu_ids=[]):
 		super(Net, self).__init__()
 		self.gpu_ids = gpu_ids
+		self.gram = nn2.GramMatrix()
 
-		# make bottleneck as an option
 		block = nn2.Bottleneck
 		upblock = nn2.UpBottleneck
 		expansion = 4
 
-		model = []
-		model += [nn2.ConvLayer(input_nc, 64, kernel_size=7, stride=1),
+		model1 = []
+		model1 += [nn2.ConvLayer(input_nc, 64, kernel_size=7, stride=1),
 							norm_layer(64),
 							nn.ReLU(inplace=True),
 							block(64, 32, 2, 1, norm_layer),
 							block(32*expansion, ngf, 2, 1, norm_layer)]
+		self.model1 = nn.Sequential(*model1)
 
+		model = []
 		self.ins = Inspiration(ngf*expansion)
-		model += [self.ins]
+		model += [self.model1]
+		model += [self.ins]	
+
 		for i in range(n_blocks):
 			model += [block(ngf*expansion, ngf, 1, None, norm_layer)]
-
+		
 		model += [upblock(ngf*expansion, 32, 2, norm_layer),
 							upblock(32*expansion, 16, 2, norm_layer),
-							norm_layer(64),
+							norm_layer(16*expansion),
 							nn.ReLU(inplace=True),
-							nn2.ConvLayer(64, output_nc, kernel_size=7, stride=1)]
+							nn2.ConvLayer(16*expansion, output_nc, kernel_size=7, stride=1)]
 		model += [nn.Tanh(),
 							nn2.MultConst()]
 		self.model = nn.Sequential(*model)
 
-	def setTarget(self, G):
+	def setTarget(self, Xs):
+		F = self.model1(Xs)
+		G = self.gram(F)
 		self.ins.setTarget(G)
 
 	def forward(self, input):
 		return self.model(input)
-
 
 class Inspiration(nn.Module):
 	""" Inspiration Layer (from MSG-Net paper)
@@ -233,7 +227,7 @@ class Inspiration(nn.Module):
 		# B is equal to 1 or input mini_batch
 		self.weight = nn.Parameter(torch.Tensor(1,C,C), requires_grad=True)
 		# non-parameter buffer
-		self.register_buffer('G', torch.Tensor(B,C,C))
+		self.G = Variable(torch.Tensor(B,C,C), requires_grad=True)
 		self.C = C
 		self.reset_parameters()
 
@@ -241,11 +235,12 @@ class Inspiration(nn.Module):
 		self.weight.data.uniform_(0.0, 0.02)
 
 	def setTarget(self, target):
-		self.G = target.expand_as(self.G)
+		self.G = target
+		#target.view_as(self.G).detach().data.clone()
 
 	def forward(self, X):
 		# input X is a 3D feature map
-		self.P = torch.bmm(self.weight.expand_as(self.G), Variable(self.G))
+		self.P = torch.bmm(self.weight.expand_as(self.G),self.G)
 		return torch.bmm(self.P.transpose(1,2).expand(X.size(0), self.C, self.C), X.view(X.size(0),X.size(1),-1)).view_as(X)
 
 	def __repr__(self):
