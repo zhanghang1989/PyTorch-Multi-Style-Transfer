@@ -41,7 +41,7 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	```
 0. Test the model
 	```bash
-	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg --model models/9styles.model
+	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg --model models/9styles.model --net-type v1
 	```
 * If you don't have a GPU, simply set `--cuda=0`. For a different style, set `--style-image path/to/style`.
 	If you would to stylize your own photo, change the `--content-image path/to/your/photo`. 
