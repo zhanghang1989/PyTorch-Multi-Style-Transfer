@@ -167,7 +167,7 @@ def evaluate(args):
 
 	style_v = Variable(style, volatile=True)
 
-	content_image = Variable(utils.preprocess_batch(content_image))
+	content_image = Variable(utils.preprocess_batch(content_image, volatile=True))
 	style_model.setTarget(style_v)
 
 	output = style_model(content_image)

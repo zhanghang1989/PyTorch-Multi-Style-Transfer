@@ -178,7 +178,7 @@ def evaluate(args):
 	features_style = vgg(style_v)
 	gram_style = [utils.gram_matrix(y) for y in features_style]
 
-	content_image = Variable(utils.preprocess_batch(content_image))
+	content_image = Variable(utils.preprocess_batch(content_image), volatile=True)
 	style_model.setTarget(gram_style[2].data)
 
 	output = style_model(content_image)
