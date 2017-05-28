@@ -46,8 +46,8 @@ class Options():
 		# optim args (Gatys CVPR 2016)
 		optim_arg = subparsers.add_parser("optim",
 									help="parser for optimization arguments")
-		optim_arg.add_argument("--net-type", type=str, default="v1",
-								help="type of the network, default is v1")
+		optim_arg.add_argument("--net-type", type=str, default="v2",
+								help="type of the network, default is v2")
 		optim_arg.add_argument("--iters", type=int, default=500,
 								help="number of training iterations, default is 500")
 		optim_arg.add_argument("--content-image", type=str, default="images/content/venice-boat.jpg",
@@ -75,8 +75,8 @@ class Options():
 
 		# evaluation args
 		eval_arg = subparsers.add_parser("eval", help="parser for evaluation/stylizing arguments")
-		eval_arg.add_argument("--net-type", type=str, default="v1",
-								help="type of the network, default is v1")
+		eval_arg.add_argument("--net-type", type=str, default="v2",
+								help="type of the network, default is v2")
 		eval_arg.add_argument("--content-image", type=str, required=True,
 								help="path to content image you want to stylize")
 		eval_arg.add_argument("--style-image", type=str, default="images/9styles/candy.jpg",
@@ -93,6 +93,19 @@ class Options():
 								help="set it to 1 for running on GPU, 0 for CPU")	
 		eval_arg.add_argument("--vgg-model-dir", type=str, default="models/",
 								help="directory for vgg, if model is not present in the directory it is downloaded")
+
+		# demo
+		demo_arg = subparsers.add_parser("demo", help="parser for evaluation/stylizing arguments")
+		demo_arg.add_argument("--style-folder", type=str, default="images/9styles/",
+								help="path to style-folder")
+		demo_arg.add_argument("--style-size", type=int, default=512,
+								help="size of style-image, default is the original size of style image")
+		demo_arg.add_argument("--cuda", type=int, default=1, 
+								help="set it to 1 for running on GPU, 0 for CPU")
+		demo_arg.add_argument("--record", type=int, default=0, 
+								help="set it to 1 for recording into video file")
+		demo_arg.add_argument("--model", type=str, required=True,
+								help="saved model to be used for stylizing the image")
 
 	def parse(self):
 		return self.parser.parse_args()

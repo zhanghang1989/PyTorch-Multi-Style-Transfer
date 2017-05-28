@@ -45,9 +45,9 @@ def train(args):
 	train_dataset = datasets.ImageFolder(args.dataset, transform)
 	train_loader = DataLoader(train_dataset, batch_size=args.batch_size, **kwargs)
 
-	transformer = Net(ngf=128)
-	print(transformer)
-	optimizer = Adam(transformer.parameters(), args.lr)
+	style_model = Net(ngf=128)
+	print(style_model)
+	optimizer = Adam(style_model.parameters(), args.lr)
 	mse_loss = torch.nn.MSELoss()
 
 	vgg = Vgg16()
@@ -55,13 +55,13 @@ def train(args):
 	vgg.load_state_dict(torch.load(os.path.join(args.vgg_model_dir, "vgg16.weight")))
 
 	if args.cuda:
-		transformer.cuda()
+		style_model.cuda()
 		vgg.cuda()
 
 	style_loader = StyleLoader(args.style_folder, args.style_size)
 
 	for e in range(args.epochs):
-		transformer.train()
+		style_model.train()
 		agg_content_loss = 0.
 		agg_style_loss = 0.
 		count = 0
@@ -74,13 +74,13 @@ def train(args):
 				x = x.cuda()
 
 			style_v = style_loader.get(batch_id)
-			transformer.setTarget(style_v)
+			style_model.setTarget(style_v)
 
 			style_v = utils.subtract_imagenet_mean_batch(style_v)
 			features_style = vgg(style_v)
 			gram_style = [utils.gram_matrix(y) for y in features_style]
 
-			y = transformer(x)
+			y = style_model(x)
 			xc = Variable(x.data.clone(), volatile=True)
 
 			y = utils.subtract_imagenet_mean_batch(y)
@@ -118,23 +118,23 @@ def train(args):
 			
 			if (batch_id + 1) % (4 * args.log_interval) == 0:
 				# save model
-				transformer.eval()
-				transformer.cpu()
+				style_model.eval()
+				style_model.cpu()
 				save_model_filename = "Epoch_" + str(e) + "iters_" + str(count) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
 					args.content_weight) + "_" + str(args.style_weight) + ".model"
 				save_model_path = os.path.join(args.save_model_dir, save_model_filename)
-				torch.save(transformer.state_dict(), save_model_path)
-				transformer.train()
-				transformer.cuda()
+				torch.save(style_model.state_dict(), save_model_path)
+				style_model.train()
+				style_model.cuda()
 				print("\nCheckpoint, trained model saved at", save_model_path)
 
 	# save model
-	transformer.eval()
-	transformer.cpu()
+	style_model.eval()
+	style_model.cpu()
 	save_model_filename = "Final_epoch_" + str(args.epochs) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
 		args.content_weight) + "_" + str(args.style_weight) + ".model"
 	save_model_path = os.path.join(args.save_model_dir, save_model_filename)
-	torch.save(transformer.state_dict(), save_model_path)
+	torch.save(style_model.state_dict(), save_model_path)
 
 	print("\nDone, trained model saved at", save_model_path)
 
@@ -151,7 +151,7 @@ def check_paths(args):
 
 
 def evaluate(args):
-	content_image = utils.tensor_load_rgbimage(args.content_image)#, size=args.content_size, keep_asp=True)
+	content_image = utils.tensor_load_rgbimage(args.content_image, size=args.content_size, keep_asp=True)
 	content_image = content_image.unsqueeze(0)
 	style = utils.tensor_load_rgbimage(args.style_image, size=args.style_size)
 	style = style.unsqueeze(0)	
@@ -167,7 +167,7 @@ def evaluate(args):
 
 	style_v = Variable(style, volatile=True)
 
-	content_image = Variable(utils.preprocess_batch(content_image, volatile=True))
+	content_image = Variable(utils.preprocess_batch(content_image), volatile=True)
 	style_model.setTarget(style_v)
 
 	output = style_model(content_image)
@@ -235,7 +235,6 @@ class Inspiration(nn.Module):
 
 	def setTarget(self, target):
 		self.G = target
-		#target.view_as(self.G).detach().data.clone()
 
 	def forward(self, X):
 		# input X is a 3D feature map
