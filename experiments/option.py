@@ -11,6 +11,8 @@ class Options():
 									help="parser for training arguments")
 		train_arg.add_argument("--net-type", type=str, default="v2",
 								help="type of the network, default is v2")
+		train_arg.add_argument("--ngf", type=int, default=128,
+								help="number of generator filter channels, default 128")
 		train_arg.add_argument("--epochs", type=int, default=2,
 								help="number of training epochs, default is 2")
 		train_arg.add_argument("--batch-size", type=int, default=4,
@@ -77,6 +79,8 @@ class Options():
 		eval_arg = subparsers.add_parser("eval", help="parser for evaluation/stylizing arguments")
 		eval_arg.add_argument("--net-type", type=str, default="v2",
 								help="type of the network, default is v2")
+		eval_arg.add_argument("--ngf", type=int, default=128,
+								help="number of generator filter channels, default 128")
 		eval_arg.add_argument("--content-image", type=str, required=True,
 								help="path to content image you want to stylize")
 		eval_arg.add_argument("--style-image", type=str, default="images/9styles/candy.jpg",
@@ -106,6 +110,10 @@ class Options():
 								help="set it to 1 for recording into video file")
 		demo_arg.add_argument("--model", type=str, required=True,
 								help="saved model to be used for stylizing the image")
+		demo_arg.add_argument("--ngf", type=int, default=128,
+								help="number of generator filter channels, default 128")
+		demo_arg.add_argument("--demo-size", type=int, default=480,
+								help="demo window height, default 480")
 
 	def parse(self):
 		return self.parser.parse_args()

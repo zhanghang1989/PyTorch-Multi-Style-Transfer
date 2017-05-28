@@ -10,7 +10,7 @@ from myutils import utils
 from myutils.StyleLoader import StyleLoader
 
 def run_demo(args, mirror=False):
-	style_model = Net(ngf=128)
+	style_model = Net(ngf=args.ngf)
 	style_model.load_state_dict(torch.load(args.model))
 	style_model.eval()
 	if args.cuda:
@@ -20,12 +20,16 @@ def run_demo(args, mirror=False):
 		style_loader = StyleLoader(args.style_folder, args.style_size, False)
 
 	# Define the codec and create VideoWriter object
+	height =  args.demo_size
+	width = int(4.0/3*args.demo_size)
+	swidth = int(width/4)
+	sheight = int(height/4)
 	if args.record:
 		fourcc = cv2.VideoWriter_fourcc('F','M','P','4')
-		out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (1280,480))
+		out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (2*width, height))
 	cam = cv2.VideoCapture(0)
-	cam.set(3, 640)
-	cam.set(4, 480)
+	cam.set(3, width)
+	cam.set(4, height)
 	key = 0
 	idx = 0
 	while True:
@@ -59,11 +63,11 @@ def run_demo(args, mirror=False):
 		simg = simg.transpose(1, 2, 0).astype('uint8')
 
 		# display
-		simg = cv2.resize(simg,(160, 120), interpolation = cv2.INTER_CUBIC)
-		cimg[0:120,0:160,:]=simg
+		simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
+		cimg[0:sheight,0:swidth,:]=simg
 		img = np.concatenate((cimg,img),axis=1)
 		cv2.imshow('MSG Demo', img)
-		cv2.imwrite('stylized/%i.jpg'%idx,img)
+		#cv2.imwrite('stylized/%i.jpg'%idx,img)
 		key = cv2.waitKey(1)
 		if args.record:
 			out.write(img)
