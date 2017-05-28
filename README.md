@@ -39,9 +39,14 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	cd PyTorch-Style-Transfer/experiments
 	bash models/download_model.sh
 	```
+0. Camera Demo
+	```bash
+	python camera_demo.py demo --model models/9styles.model
+	```
+	![](images/myimage.gif)
 0. Test the model
 	```bash
-	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg --model models/9styles.model
+	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg --model models/9styles.model --content-size 1024
 	```
 * If you don't have a GPU, simply set `--cuda=0`. For a different style, set `--style-image path/to/style`.
 	If you would to stylize your own photo, change the `--content-image path/to/your/photo`. 
