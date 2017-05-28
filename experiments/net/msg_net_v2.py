@@ -45,7 +45,7 @@ def train(args):
 	train_dataset = datasets.ImageFolder(args.dataset, transform)
 	train_loader = DataLoader(train_dataset, batch_size=args.batch_size, **kwargs)
 
-	style_model = Net(ngf=128)
+	style_model = Net(ngf=args.ngf)
 	print(style_model)
 	optimizer = Adam(style_model.parameters(), args.lr)
 	mse_loss = torch.nn.MSELoss()
@@ -157,7 +157,7 @@ def evaluate(args):
 	style = style.unsqueeze(0)	
 	style = utils.preprocess_batch(style)
 
-	style_model = Net(ngf=128)
+	style_model = Net(ngf=args.ngf)
 	style_model.load_state_dict(torch.load(args.model))
 
 	if args.cuda:
