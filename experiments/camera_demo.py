@@ -57,7 +57,7 @@ def run_demo(args, mirror=False):
 			simg = style_v.cpu().data[0].numpy()
 			img = img.cpu().clamp(0, 255).data[0].numpy()
 		else:
-			simg = style_v.data().numpy()
+			simg = style_v.data[0].numpy()
 			img = img.clamp(0, 255).data[0].numpy()
 		img = img.transpose(1, 2, 0).astype('uint8')
 		simg = simg.transpose(1, 2, 0).astype('uint8')
