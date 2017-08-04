@@ -41,12 +41,12 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	```
 0. Camera Demo
 	```bash
-	python camera_demo.py demo --model models/9styles.model
+	python camera_demo.py demo --model models/21styles.model
 	```
 	![](images/myimage.gif)
 0. Test the model
 	```bash
-	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg --model models/9styles.model --content-size 1024
+	python main.py eval --content-image images/content/venice-boat.jpg --style-image images/21styles/candy.jpg --model models/21styles.model --content-size 1024
 	```
 * If you don't have a GPU, simply set `--cuda=0`. For a different style, set `--style-image path/to/style`.
 	If you would to stylize your own photo, change the `--content-image path/to/your/photo`. 
@@ -88,7 +88,7 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 [Image Style Transfer Using Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf) by Leon A. Gatys, Alexander S. Ecker, and Matthias Bethge.
 
 ```bash
-python main.py optim --content-image images/content/venice-boat.jpg --style-image images/9styles/candy.jpg
+python main.py optim --content-image images/content/venice-boat.jpg --style-image images/21styles/candy.jpg
 ```
 * `--content-image`: path to content image.
 * `--style-image`: path to style image.
