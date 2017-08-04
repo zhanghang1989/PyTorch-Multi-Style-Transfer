@@ -186,7 +186,7 @@ def evaluate(args):
 
 
 class Net(nn.Module):
-	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn2.InstanceNormalization, n_blocks=9, gpu_ids=[]):
+	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn.InstanceNorm2d, n_blocks=9, gpu_ids=[]):
 		super(Net, self).__init__()
 		self.gpu_ids = gpu_ids
 

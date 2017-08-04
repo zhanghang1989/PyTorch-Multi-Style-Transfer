@@ -42,7 +42,7 @@ def run_demo(args, mirror=False):
 		img = np.array(img).transpose(2, 0, 1)
 		# changing style 
 		if idx%20 == 1:
-			style_v = style_loader.get(int(idx/30))
+			style_v = style_loader.get(int(idx/20))
 			style_v = Variable(style_v.data, volatile=True)
 			style_model.setTarget(style_v)
 
@@ -57,7 +57,7 @@ def run_demo(args, mirror=False):
 			simg = style_v.cpu().data[0].numpy()
 			img = img.cpu().clamp(0, 255).data[0].numpy()
 		else:
-			simg = style_v.data[0].numpy()
+			simg = style_v.data().numpy()
 			img = img.clamp(0, 255).data[0].numpy()
 		img = img.transpose(1, 2, 0).astype('uint8')
 		simg = simg.transpose(1, 2, 0).astype('uint8')

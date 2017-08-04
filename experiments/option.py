@@ -78,7 +78,7 @@ class Options():
 		# evaluation args
 		eval_arg = subparsers.add_parser("eval", help="parser for evaluation/stylizing arguments")
 		eval_arg.add_argument("--net-type", type=str, default="v2",
-								help="type of the network, default is v2")
+help="type of the network, default is v2")
 		eval_arg.add_argument("--ngf", type=int, default=128,
 								help="number of generator filter channels, default 128")
 		eval_arg.add_argument("--content-image", type=str, required=True,
@@ -89,6 +89,8 @@ class Options():
 								help="factor for scaling down the content image")
 		eval_arg.add_argument("--style-size", type=int, default=512,
 								help="size of style-image, default is the original size of style image")
+		eval_arg.add_argument("--style-folder", type=str, default="images/9styles/",
+								help="path to style-folder")
 		eval_arg.add_argument("--output-image", type=str, default="output.jpg",
 								help="path for saving the output image")
 		eval_arg.add_argument("--model", type=str, required=True,

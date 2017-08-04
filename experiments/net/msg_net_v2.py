@@ -46,6 +46,9 @@ def train(args):
 	train_loader = DataLoader(train_dataset, batch_size=args.batch_size, **kwargs)
 
 	style_model = Net(ngf=args.ngf)
+	if args.resume is not None:
+		print('Resuming, initializing using weight from {}.'.format(args.resume))
+		style_model.load_state_dict(torch.load(args.resume))
 	print(style_model)
 	optimizer = Adam(style_model.parameters(), args.lr)
 	mse_loss = torch.nn.MSELoss()
@@ -174,8 +177,36 @@ def evaluate(args):
 	utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
+def fast_evaluate(args, basedir, contents, idx = 0):
+	# basedir to save the data
+	style_model = Net(ngf=args.ngf)
+	style_model.load_state_dict(torch.load(args.model))
+	style_model.eval()
+	if args.cuda:
+		style_model.cuda()
+	
+	style_loader = StyleLoader(args.style_folder, args.style_size, 
+		cuda=args.cuda)
+
+	for content_image in contents:
+		idx += 1
+		content_image = utils.tensor_load_rgbimage(content_image, size=args.content_size, keep_asp=True).unsqueeze(0)
+		if args.cuda:
+			content_image = content_image.cuda()
+		content_image = Variable(utils.preprocess_batch(content_image), volatile=True)
+
+		for isx in range(style_loader.size()):
+			style_v = Variable(style_loader.get(isx).data, volatile=True)
+			style_model.setTarget(style_v)
+			output = style_model(content_image)
+			filename = os.path.join(basedir, "{}_{}.png".format(idx, isx+1))
+			utils.tensor_save_bgrimage(output.data[0], filename, args.cuda)
+			print(filename)
+		
+		
+
 class Net(nn.Module):
-	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn2.InstanceNormalization, n_blocks=6, gpu_ids=[]):
+	def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn.InstanceNorm2d, n_blocks=6, gpu_ids=[]):
 		super(Net, self).__init__()
 		self.gpu_ids = gpu_ids
 		self.gram = nn2.GramMatrix()
