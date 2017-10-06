@@ -4,10 +4,10 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
-from net.msg_net_v2 import Net
+from net import Net
 from option import Options
-from myutils import utils
-from myutils.StyleLoader import StyleLoader
+import utils
+from utils import StyleLoader
 
 def run_demo(args, mirror=False):
 	style_model = Net(ngf=args.ngf)
@@ -57,7 +57,7 @@ def run_demo(args, mirror=False):
 			simg = style_v.cpu().data[0].numpy()
 			img = img.cpu().clamp(0, 255).data[0].numpy()
 		else:
-			simg = style_v.data[0].numpy()
+			simg = style_v.data().numpy()
 			img = img.clamp(0, 255).data[0].numpy()
 		img = img.transpose(1, 2, 0).astype('uint8')
 		simg = simg.transpose(1, 2, 0).astype('uint8')

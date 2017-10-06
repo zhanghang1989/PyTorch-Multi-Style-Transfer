@@ -1,7 +1,6 @@
 # PyTorch-Style-Transfer
 
-This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Style (Gatys et al. CVPR 2016)](#neural-style)**. Please install [PyTorch](http://pytorch.org/) with cuda support before running the code. The code has been tested on Ubuntu 16.04 with Titan X Pascal and Maxwell.
-If you would like to produce exactly the same result as in the MSG-Net paper, please visit our original [Torch implementation](https://github.com/zhanghang1989/MSG-Net/).
+This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Style (Gatys et al. CVPR 2016)](#neural-style)**. We also provide [Torch implementation](https://github.com/zhanghang1989/MSG-Net/) and [MXNet implementation](https://github.com/zhanghang1989/MXNet-Gluon-Style-Transfer).
 
 **Tabe of content**
 
@@ -9,7 +8,6 @@ If you would like to produce exactly the same result as in the MSG-Net paper, pl
 	- [Stylize Images using Pre-trained Model](#stylize-images-using-pre-trained-msg-net)
 	- [Train Your Own MSG-Net Model](#train-your-own-msg-net-model)
 * [Slow Neural Style Transfer](#neural-style)
-* [Extending the Software](#extending-the-software)
 
 ## MSG-Net
 <table width="100%" border="0" cellspacing="15" cellpadding="0">
@@ -97,19 +95,14 @@ python main.py optim --content-image images/content/venice-boat.jpg --style-imag
 * `--style-size`: the style image size to test on.
 * `--cuda`: set it to 1 for running on GPU, 0 for CPU.
 
-<img src ="images/g1.jpg" width="260px" />
-
-## Extending the Software
-
-* Extending a new network type:
-	- define your own file under the folder `net/` 
-	- implement your own `nn.Module` in `mynn.py` if need
-	- implement train and evaluate functions base on your need
-	- set up the network as in `main.py`
-* Extending a new experiment (requires differet setting)
-	- define the subcommand of the options in `option.py`
-	- implement the experiment function like `optimize()`
-	- set up the experiment as in `main.py`
+<img src ="images/g1.jpg" width="260px" /> <img src ="images/g2.jpg" width="260px" />
+<img src ="images/g3.jpg" width="260px" />
+<img src ="images/g4.jpg" width="260px" />
+<img src ="images/g5.jpg" width="260px" />
+<img src ="images/g6.jpg" width="260px" />
+<img src ="images/g7.jpg" width="260px" />
+<img src ="images/g8.jpg" width="260px" />
+<img src ="images/g9.jpg" width="260px" />
 
 ### Acknowledgement
 The code benefits from outstanding prior work and their implementations including:
