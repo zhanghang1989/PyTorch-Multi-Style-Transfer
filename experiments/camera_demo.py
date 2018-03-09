@@ -43,14 +43,14 @@ def run_demo(args, mirror=False):
 		# changing style 
 		if idx%20 == 1:
 			style_v = style_loader.get(int(idx/20))
-			style_v = Variable(style_v.data, volatile=True)
+			style_v = Variable(style_v.data)
 			style_model.setTarget(style_v)
 
 		img=torch.from_numpy(img).unsqueeze(0).float()
 		if args.cuda:
 			img=img.cuda()
 
-		img = Variable(img, volatile=True)
+		img = Variable(img)
 		img = style_model(img)
 
 		if args.cuda:
