@@ -163,7 +163,7 @@ def train(args):
             gram_style = [utils.gram_matrix(y) for y in features_style]
 
             y = style_model(x)
-            xc = Variable(x.data.clone(), volatile=True)
+            xc = Variable(x.data.clone())
 
             y = utils.subtract_imagenet_mean_batch(y)
             xc = utils.subtract_imagenet_mean_batch(xc)
@@ -240,16 +240,16 @@ def evaluate(args):
     style = utils.preprocess_batch(style)
 
     style_model = Net(ngf=args.ngf)
-    style_model.load_state_dict(torch.load(args.model))
+    style_model.load_state_dict(torch.load(args.model), False)
 
     if args.cuda:
         style_model.cuda()
         content_image = content_image.cuda()
         style = style.cuda()
 
-    style_v = Variable(style, volatile=True)
+    style_v = Variable(style)
 
-    content_image = Variable(utils.preprocess_batch(content_image), volatile=True)
+    content_image = Variable(utils.preprocess_batch(content_image))
     style_model.setTarget(style_v)
 
     output = style_model(content_image)
@@ -259,7 +259,7 @@ def evaluate(args):
 def fast_evaluate(args, basedir, contents, idx = 0):
     # basedir to save the data
     style_model = Net(ngf=args.ngf)
-    style_model.load_state_dict(torch.load(args.model))
+    style_model.load_state_dict(torch.load(args.model), False)
     style_model.eval()
     if args.cuda:
         style_model.cuda()
@@ -272,10 +272,10 @@ def fast_evaluate(args, basedir, contents, idx = 0):
         content_image = utils.tensor_load_rgbimage(content_image, size=args.content_size, keep_asp=True).unsqueeze(0)
         if args.cuda:
             content_image = content_image.cuda()
-        content_image = Variable(utils.preprocess_batch(content_image), volatile=True)
+        content_image = Variable(utils.preprocess_batch(content_image))
 
         for isx in range(style_loader.size()):
-            style_v = Variable(style_loader.get(isx).data, volatile=True)
+            style_v = Variable(style_loader.get(isx).data)
             style_model.setTarget(style_v)
             output = style_model(content_image)
             filename = os.path.join(basedir, "{}_{}.png".format(idx, isx+1))
