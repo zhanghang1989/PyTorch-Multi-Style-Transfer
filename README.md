@@ -1,6 +1,6 @@
 # PyTorch-Style-Transfer
 
-This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Style (Gatys et al. CVPR 2016)](#neural-style)**. We also provide [Torch implementation](https://github.com/zhanghang1989/MSG-Net/) and [MXNet implementation](https://github.com/zhanghang1989/MXNet-Gluon-Style-Transfer).
+This repo provides PyTorch Implementation of **[MSG-Net (ours)](#msg-net)** and **[Neural Style (Gatys et al. CVPR 2016)](#neural-style)**. We also provide [Torch implementation](https://github.com/zhanghang1989/MSG-Net/) and [MXNet implementation](https://github.com/zhanghang1989/MXNet-Gluon-Style-Transfer).
 
 **Tabe of content**
 
