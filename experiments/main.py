@@ -12,6 +12,7 @@ import os
 import sys
 import time
 import numpy as np
+from tqdm import tqdm, trange
 
 import torch
 from torch.optim import Adam
@@ -82,7 +83,8 @@ def optimize(args):
     optimizer = Adam([output], lr=args.lr)
     mse_loss = torch.nn.MSELoss()
     # optimizing the images
-    for e in range(args.iters):
+    tbar = trange(args.iters)
+    for e in tbar:
         utils.imagenet_clamp_batch(output, 0, 255)
         optimizer.zero_grad()
         features_y = vgg(output)
@@ -95,12 +97,9 @@ def optimize(args):
             style_loss += args.style_weight * mse_loss(gram_y, gram_s)
 
         total_loss = content_loss + style_loss
-
-        if (e + 1) % args.log_interval == 0:
-            print(total_loss.data.cpu().numpy()[0])
         total_loss.backward()
-        
         optimizer.step()
+        tbar.set_description(total_loss.data.cpu().numpy()[0])
     # save the image    
     output = utils.add_imagenet_mean_batch(output)
     utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
@@ -142,7 +141,8 @@ def train(args):
 
     style_loader = utils.StyleLoader(args.style_folder, args.style_size)
 
-    for e in range(args.epochs):
+    tbar = trange(args.epochs)
+    for e in tbar:
         style_model.train()
         agg_content_loss = 0.
         agg_style_loss = 0.
@@ -195,25 +195,27 @@ def train(args):
                                 agg_style_loss / (batch_id + 1),
                                 (agg_content_loss + agg_style_loss) / (batch_id + 1)
                 )
-                print(mesg)
+                tbar.set_description(mesg)
 
             
             if (batch_id + 1) % (4 * args.log_interval) == 0:
                 # save model
                 style_model.eval()
                 style_model.cpu()
-                save_model_filename = "Epoch_" + str(e) + "iters_" + str(count) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
+                save_model_filename = "Epoch_" + str(e) + "iters_" + str(count) + "_" + \
+                    str(time.ctime()).replace(' ', '_') + "_" + str(
                     args.content_weight) + "_" + str(args.style_weight) + ".model"
                 save_model_path = os.path.join(args.save_model_dir, save_model_filename)
                 torch.save(style_model.state_dict(), save_model_path)
                 style_model.train()
                 style_model.cuda()
-                print("\nCheckpoint, trained model saved at", save_model_path)
+                tbar.set_description("\nCheckpoint, trained model saved at", save_model_path)
 
     # save model
     style_model.eval()
     style_model.cpu()
-    save_model_filename = "Final_epoch_" + str(args.epochs) + "_" + str(time.ctime()).replace(' ', '_') + "_" + str(
+    save_model_filename = "Final_epoch_" + str(args.epochs) + "_" + \
+        str(time.ctime()).replace(' ', '_') + "_" + str(
         args.content_weight) + "_" + str(args.style_weight) + ".model"
     save_model_path = os.path.join(args.save_model_dir, save_model_filename)
     torch.save(style_model.state_dict(), save_model_path)
@@ -253,6 +255,7 @@ def evaluate(args):
     style_model.setTarget(style_v)
 
     output = style_model(content_image)
+    output = utils.color_match(output, style_v)
     utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
