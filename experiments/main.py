@@ -255,7 +255,7 @@ def evaluate(args):
     style_model.setTarget(style_v)
 
     output = style_model(content_image)
-    output = utils.color_match(output, style_v)
+    #output = utils.color_match(output, style_v)
     utils.tensor_save_bgrimage(output.data[0], args.output_image, args.cuda)
 
 
