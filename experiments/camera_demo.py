@@ -53,7 +53,7 @@ def run_demo(args, mirror=False):
 		img = Variable(img)
 		img = style_model(img)
 
-		if args.cuda:
+		if not args.cuda:
 			simg = style_v.cpu().data[0].numpy()
 			img = img.cpu().clamp(0, 255).data[0].numpy()
 		else:
