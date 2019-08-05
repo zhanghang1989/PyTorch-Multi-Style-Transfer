@@ -242,7 +242,12 @@ def evaluate(args):
     style = utils.preprocess_batch(style)
 
     style_model = Net(ngf=args.ngf)
-    style_model.load_state_dict(torch.load(args.model), False)
+    model_dict = torch.load(args.model)
+    model_dict_clone = model_dict.copy()
+    for key, value in model_dict_clone.items():
+        if key.endswith(('running_mean', 'running_var')):
+            del model_dict[key]
+    style_model.load_state_dict(model_dict, False)
 
     if args.cuda:
         style_model.cuda()

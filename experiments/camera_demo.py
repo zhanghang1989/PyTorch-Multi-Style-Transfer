@@ -11,7 +11,12 @@ from utils import StyleLoader
 
 def run_demo(args, mirror=False):
 	style_model = Net(ngf=args.ngf)
-	style_model.load_state_dict(torch.load(args.model))
+	model_dict = torch.load(args.model)
+	model_dict_clone = model_dict.copy()
+	for key, value in model_dict_clone.items():
+		if key.endswith(('running_mean', 'running_var')):
+			del model_dict[key]
+	style_model.load_state_dict(model_dict, False)
 	style_model.eval()
 	if args.cuda:
 		style_loader = StyleLoader(args.style_folder, args.style_size)
@@ -57,8 +62,9 @@ def run_demo(args, mirror=False):
 			simg = style_v.cpu().data[0].numpy()
 			img = img.cpu().clamp(0, 255).data[0].numpy()
 		else:
-			simg = style_v.data().numpy()
+			simg = style_v.data.numpy()
 			img = img.clamp(0, 255).data[0].numpy()
+		simg = np.squeeze(simg)
 		img = img.transpose(1, 2, 0).astype('uint8')
 		simg = simg.transpose(1, 2, 0).astype('uint8')
 

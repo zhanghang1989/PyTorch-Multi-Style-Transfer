@@ -14,7 +14,7 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.autograd import Variable
-from torch.utils.serialization import load_lua
+from torchfile import load as load_lua
 
 from net import Vgg16
 
