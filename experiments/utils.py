@@ -14,7 +14,7 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.autograd import Variable
-from torch.utils.serialization import load_lua
+from torchfile import load as load_lua
 
 from net import Vgg16
 
@@ -124,27 +124,3 @@ class StyleLoader():
 
     def size(self):
         return len(self.files)
-
-def matSqrt(x):
-    U,D,V = torch.svd(x)
-    return U * (D.pow(0.5).diag()) * V.t()
-
-def color_match(src, dst):
-    src_flat = src.view(3,-1)
-    dst_flat = dst.view(3,-1)
-
-    src_mean = src_flat.mean(1, True)
-    src_std = src_flat.std(1, True)
-    src_norm = (src_flat - src_mean) / src_std
-
-    dst_mean = dst_flat.mean(1, True) 
-    dst_std = dst_flat.std(1, True)
-    dst_norm = (dst_flat - dst_mean) / dst_std
-
-    src_flat_cov_eye = src_norm @ src_norm.t() + Variable(torch.eye(3).cuda())
-    dst_flat_cov_eye = dst_norm @ dst_norm.t() + Variable(torch.eye(3).cuda())
-
-    src_flat_nrom_trans = matSqrt(dst_flat_cov_eye) * \
-        matSqrt(src_flat_cov_eye).inverse * src_norm
-    src_flat_transfer = src_flat_nrom_trans * dst_std + dst_mean
-    return src_flat_transfer.view_as(src)
