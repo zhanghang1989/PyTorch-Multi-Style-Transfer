@@ -1,6 +1,6 @@
 numpy==1.21.0
 opencv_python==4.2.0.32
-Pillow==9.0.0
+Pillow==9.0.1
 torch==1.5.0
 torchfile==0.1.0
 torchvision==0.6.0a0+82fd1c8
